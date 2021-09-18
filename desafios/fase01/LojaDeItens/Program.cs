@@ -4,8 +4,14 @@ namespace LojaDeItens
 {
     class Program
     {
-        private static string[] _items = new[] {"Pão de Queijo", "Acarajé", "Feijoada"};
-        private static string[] _bag = Array.Empty<string>();
+        private static Item[] _items = new[]
+        {
+            new Item { Name  = "Pão de Queijo", Coin = 1 },
+            new Item { Name  = "Acarajé", Coin = 3 },
+            new Item { Name  = "Feijoada", Coin = 2 } 
+        };
+
+        private static Item[] _bag = Array.Empty<Item>();
         private static int coins = 5;
         
         static void Main(string[] args)
@@ -37,7 +43,7 @@ namespace LojaDeItens
             Console.WriteLine("Essas são as nossas opções:");
             for (int i = 0; i < _items.Length; i++)
             {
-                Console.WriteLine("{0}: {1}", i+1, _items[i]);
+                Console.WriteLine("{0}: {1} {2}", i+1, _items[i].Name, _items[i].Coin);
             }
         }
         
@@ -46,7 +52,7 @@ namespace LojaDeItens
             Console.WriteLine("Você não tem mais dinheiro! Esses são seus items:");
             for (int i = 0; i < _bag.Length; i++)
             {
-                Console.WriteLine("{0}: {1}", i+1, _bag[i]);
+                Console.WriteLine("{0}: {1} {2}", i+1, _bag[i].Name, _bag[i].Coin);
             }
 
             Console.ReadKey();
@@ -64,22 +70,20 @@ namespace LojaDeItens
                 while (!valideInput)
                 {
                     Console.Write("Digite o número do item que você quer comprar -->");
-                    valideInput = ReadInput(contador, coins);
+                    valideInput = ReadInput(contador);
                 }
-
-                coins--;
                 contador++;
             }
         }
 
-        private static bool ReadInput(int contador, int coins)
+        private static bool ReadInput(int contador)
         {
             var x = Console.ReadLine()?.Trim();
 
             int.TryParse(x, out var index);
 
             index--;
-
+            
             if (index < 0 || index >= _items.Length)
             {
                 Console.WriteLine("Eu não conheco esse item. E Você  não sai daqui até comprar!");
@@ -88,15 +92,25 @@ namespace LojaDeItens
             
             var item = _items[index];
 
+            if (item.Coin > coins)
+            {
+                Console.WriteLine("Você não tem coins suficiente {0}", coins);
+                return false;
+            }
+
             if (contador >= _bag.Length)
             {
                 var newlength = contador + 1;
                 Array.Resize(ref _bag, newlength);
             }
-            
-            Console.WriteLine("Você comprou {0} por 1 coin! você tem {1}", item, coins - 1);
+
+            Console.WriteLine("Você comprou {0} por {1} coin! você tem {2}",
+                item.Name,
+                item.Coin,
+                coins - item.Coin);
             
             _bag[contador] = item;
+            coins -= item.Coin;
             
             return true;
         }
